@@ -1,58 +1,45 @@
 import inquirer from "inquirer";
+
 import Intern from "./lib/Intern.js";
 import Engineer from "./lib/Engineer.js";
 import Manager from "./lib/Manager.js";
 
 import {loopQuestions, internQuestions, managerQuestions, engineerQuestions} from "./lib/questions.js"
 
-console.log("\nEnter Manager Information:\n");
+console.log("\nEnter Manager Information:");
 
-let employees = [];
-
-function addEngineer(employees) {
-    inquirer
-        .prompt(engineerQuestions)
-        .then((answers) => {
-            employees = [...employees, new Engineer(answers)];
-        });
-
-    return employees;
+// Broken out for future improvement
+async function getAnswers(questions) {
+    return await inquirer.prompt(questions);
 }
 
-function addIntern(employees) {
-    inquirer
-        .prompt(internQuestions)
-        .then((answers) => {
-            employees = [...employees, new Intern(answers)];
-        })
+// Get all the employees to be rendered
+async function getEmployees() {
+    let employees = [];
 
-    return employees;
-}
+    let m = await getAnswers(managerQuestions);
+    employees = [...employees, new Manager(m)];
 
-function addNextEmployee(employees) {
-    inquirer
-    .prompt(loopQuestions)
-    .then((answers) => {
-        switch (answers.choice) {
-            case "Add Engineer":
-                // TODO: Figure out why this isn't working as expected
-                addEngineer(employees);
-                addNextEmployee(employees)
-                break;
-            case "Add Intern":
-                addIntern(employees);
-                addNextEmployee(employees)
-                break;
-            case "End":
-                break;
+    let choice;
+    while (choice != "End") {
+        if (choice == "Add Engineer") {
+            let e = await getAnswers(engineerQuestions);
+            employees = [...employees, new Engineer(e)];
+        } else if (choice == "Add Intern") {
+            let i = await getAnswers(internQuestions);
+            employees = [...employees, new Intern(i)];
         }
-    })
+        const selection = await getAnswers(loopQuestions);
+        choice = selection.choice;
+    }
+
+    return employees;
 }
 
-inquirer
-    .prompt(managerQuestions)
-    .then((answers) => {
-        employees = [...employees, new Manager(answers)];
+// When we run the page
+function init() {
+    let employees = getEmployees();
+}
 
-        addNextEmployee(employees);
-    });
+// Run the page
+init();
