@@ -1,5 +1,7 @@
 import inquirer from "inquirer";
 
+import {readFileSync, writeFileSync} from "fs";
+
 import Intern from "./lib/Intern.js";
 import Engineer from "./lib/Engineer.js";
 import Manager from "./lib/Manager.js";
@@ -33,12 +35,48 @@ async function getEmployees() {
         choice = selection.choice;
     }
 
-    return employees;
+    generateWebpage(employees);
+
+}
+
+function generateWebpage(employees) {
+    let webpage = readFileSync("./src/team.html").toString();
+    let cardTemplate = readFileSync("./src/card.html").toString();
+
+    let cards = "";
+
+    for (let employee of employees) {
+        let card = cardTemplate;
+        let role = employee.getRole();
+
+        card = card.replace("ROLE", role);
+        card = card.replace("NAME", employee.getName());
+        card = card.replace("ID", `ID: ${employee.getID()}`);
+        card = card.replace("EMAIL", `Email: ${employee.getEmail()}`);
+
+        switch (role) {
+            case "Manager":
+                card = card.replace("SPECIAL", `Office Number: ${employee.officeNumber}`);
+                break;
+            case "Engineer":
+                card = card.replace("SPECIAL", `GitHub Username: ${employee.gh_username}`);
+                break;
+            case "Intern":
+                card = card.replace("SPECIAL", `School: ${employee.school}`);
+                break;
+        }
+
+        cards += card;
+    }
+
+    webpage = webpage.replace("CARDS", cards)
+    writeFileSync("./dist/team.html", webpage)
 }
 
 // When we run the page
 function init() {
     let employees = getEmployees();
+
 }
 
 // Run the page
