@@ -59,7 +59,7 @@ function generateWebpage(employees) {
                 card = card.replace("SPECIAL", `Office Number: ${employee.officeNumber}`);
                 break;
             case "Engineer":
-                card = card.replace("SPECIAL", `GitHub Username: ${employee.gh_username}`);
+                card = card.replace("SPECIAL", `GitHub Username: <a href="https://github.com/${employee.gh_username}" target="_blank">${employee.gh_username}</a>`);
                 break;
             case "Intern":
                 card = card.replace("SPECIAL", `School: ${employee.school}`);
