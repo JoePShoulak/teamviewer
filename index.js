@@ -36,7 +36,6 @@ async function getEmployees() {
     }
 
     generateWebpage(employees);
-
 }
 
 function generateWebpage(employees) {
@@ -76,8 +75,7 @@ function generateWebpage(employees) {
 
 // When we run the page
 function init() {
-    let employees = getEmployees();
-
+    getEmployees();
 }
 
 // Run the page
