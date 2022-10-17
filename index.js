@@ -6,9 +6,7 @@ import Intern from "./lib/Intern.js";
 import Engineer from "./lib/Engineer.js";
 import Manager from "./lib/Manager.js";
 
-import {loopQuestions, internQuestions, managerQuestions, engineerQuestions} from "./lib/questions.js"
-
-console.log("\nEnter Manager Information:");
+import questions from "./lib/questions.js"
 
 // Broken out for future improvement
 async function getAnswers(questions) {
@@ -19,23 +17,28 @@ async function getAnswers(questions) {
 async function getEmployees() {
     let employees = [];
 
-    let m = await getAnswers(managerQuestions);
-    employees = [...employees, new Manager(m)];
+    let newManager = await getAnswers(questions.manager);
+    employees.append(new Manager(newManager));
 
     let choice;
     while (choice != "End") {
-        if (choice == "Add Engineer") {
-            let e = await getAnswers(engineerQuestions);
-            employees = [...employees, new Engineer(e)];
-        } else if (choice == "Add Intern") {
-            let i = await getAnswers(internQuestions);
-            employees = [...employees, new Intern(i)];
+        switch (choice) {
+            case "Add Engineer": 
+                let newEngineer = await getAnswers(questions.engineer);
+                employees.append(new Engineer(newEngineer));
+                break;
+            case "Add Intern":
+                let newIntern = await getAnswers(questions.intern);
+                employees.append(new Intern(newIntern));
+                break;
+            default:
+                break;
         }
-        const selection = await getAnswers(loopQuestions);
-        choice = selection.choice;
+        
+        choice = (await getAnswers(questions.loop)).choice;
     }
 
-    generateWebpage(employees);
+    return employees;
 }
 
 function generateWebpage(employees) {
@@ -51,7 +54,6 @@ function generateWebpage(employees) {
         card = card.replace("ROLE", role);
         card = card.replace("NAME", employee.getName());
         card = card.replace("ID", `ID: ${employee.getID()}`);
-        // TODO: Make email be a link
         card = card.replace("EMAIL", `Email: <a href="mailto:${employee.getEmail()}">${employee.getEmail()}</a>`);
 
         switch (role) {
@@ -75,7 +77,8 @@ function generateWebpage(employees) {
 
 // When we run the page
 function init() {
-    getEmployees();
+    const employees = getEmployees();
+    generateWebpage(employees);
 }
 
 // Run the page
